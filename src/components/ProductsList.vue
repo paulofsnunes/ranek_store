@@ -1,19 +1,22 @@
 <template>
     <section class="product-container">
-        <div v-if="produtos && produtos.length" class="products">
-            <div class="product" v-for="(produto, index) in produtos" :key="index">
-                <router-link to="/">
-                    <img v-if="produto.fotos" :src="produto.fotos[0].src" :alt="produto.fotos[0].titulo">
-                    <p class="price">{{produto.preco}}</p>
-                    <h2 class="title">{{produto.nome}}</h2>
-                    <p class="description">{{produto.descricao}}</p>
-                </router-link>
+        <transition mode="out-in">
+            <div v-if="produtos && produtos.length" class="products" key="products">
+                <div class="product" v-for="(produto, index) in produtos" :key="index">
+                    <router-link to="/">
+                        <img v-if="produto.fotos" :src="produto.fotos[0].src" :alt="produto.fotos[0].titulo">
+                        <p class="price">{{produto.preco}}</p>
+                        <h2 class="title">{{produto.nome}}</h2>
+                        <p class="description">{{produto.descricao}}</p>
+                    </router-link>
+                </div>
+                <products-page :productsTotal="productsTotal" :productsForPage="productsForPage"/>
             </div>
-            <products-page :productsTotal="productsTotal" :productsForPage="productsForPage"/>
-        </div>
-        <div v-else-if="produtos && produtos.length === 0">
-            <p class="no-results">Busca sem resultados ☹️ Tente buscar outro termo.</p>
-        </div>
+            <div v-else-if="produtos && produtos.length === 0" key="no-results">
+                <p class="no-results">Busca sem resultados ☹️ Tente buscar outro termo.</p>
+            </div>
+            <page-loading v-else key="loading"/>
+        </transition>
     </section>
 </template>
 
@@ -31,7 +34,7 @@ export default {
     data() {
         return {
             produtos: null,
-            productsForPage: 3,
+            productsForPage: 9,
             productsTotal: 0
         }
     },
@@ -43,12 +46,15 @@ export default {
     },
     methods: {
         getProducts() {
-            api.get(this.url)
-            .then(r => {
+            this.produtos = null
+            window.setTimeout(() => {
+                api.get(this.url)
+                .then(r => {
                 this.productsTotal = Number(r.headers["x-total-count"])
                 console.log(r)
                 this.produtos = r.data
             })
+            }, 1500)
         }
     },
     watch: {
