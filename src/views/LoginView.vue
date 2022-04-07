@@ -32,7 +32,10 @@ export default {
         };
     },
     methods: {
-    logar() {}
+        logar() {
+            this.$store.dispatch("getUser", this.login.email)
+            this.$router.push({name: "user"})
+        }
     }
 };
 </script>
