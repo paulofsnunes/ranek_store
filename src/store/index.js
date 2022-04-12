@@ -19,7 +19,8 @@ export default new Vuex.Store({
       bairro: "",
       cidade: "",
       estado: "",
-    }
+    },
+    user_products: null
   },
   getters: {
   },
@@ -29,9 +30,21 @@ export default new Vuex.Store({
     },
     UPDATE_USER(state, payload) {
       state.usuario = Object.assign(state.usuario, payload)
+    },
+    UPDATE_USER_PRDUCTS(state, payload) {
+      state.user_products = payload
+    },
+    ADD_USER_PRDUCTS(state, payload) {
+      state.user_products.unshit(payload)
     }
   },
   actions: {
+    getUserProducts(context) {
+      api.get(`/produto?usuario_id=${context.state.usuario.id}`)
+      .then(r => {
+        context.commit("UPDATE_USER_PRDUCTS", r.data)
+      })
+    },
     getUser(context, payload) {
       return api.get(`/usuario/${payload}`).then(r => {
         context.commit("UPDATE_USER", r.data)
